@@ -12,6 +12,7 @@ class User(db.Model):
     subscription_date = db.Column(db.Date, unique=False, nullable=False)
 
     favorites = db.relationship('Favorite', backref = 'user', lazy = True)
+    # REFERENCIA A LA RELACION ENTRE LA TABLA USER Y FAVORITE
 
     def __repr__(self):
         return f'Email: {self.email} - ID: {self.id}' # ALTERNATIVA A ['<User %r>' % self.email] PARA COMPLEMENTAR EMAIL CON ID
@@ -27,10 +28,12 @@ class User(db.Model):
             # do not serialize the password, its a security breach
         }
     
+    # MOSTRAR DATOS DEL USUARIO Y SU LISTA DE FAVORITOS DEL USUAIRO
     def get_user_favorite(self):
         return {
             "user": self.serialize(),
             "favorites": list(map(lambda item: item.serialize(), self.favorites))
+            # LISTA DE USUARIOS SERIALIZADA
         }
     
 # CHARACTERS
@@ -63,6 +66,7 @@ class Planet(db.Model):
     diameter = db.Column(db.String(250), nullable=False)
 
     favorite = db.relationship('Favorite', backref = 'planet', lazy = True)
+    
 
     def __repr__(self):
         return '<Planet %r>' % self.name
@@ -108,7 +112,7 @@ class Favorite(db.Model):
     def __repr__(self):
         return '<Favorite %r>' % self.id
         # return f"User: {str(self.user_id)}{' - Character: ' + str(self.character_id) if self.character_id else ''}{' - Planet: ' + str(self.planet_id) if self.planet_id else ''}{' - Vehicle: ' + str(self.vehicle_id) if self.vehicle_id else ''}"
-
+        # EVITAR MOSTRAR DATOS DE LOS CAMPOS VACIOS
 
     def serialize(self):
         return {

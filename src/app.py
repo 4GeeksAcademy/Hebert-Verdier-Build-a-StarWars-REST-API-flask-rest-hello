@@ -108,7 +108,7 @@ def get_characters():
     if len(characters) == 0:
         return jsonify('no characters found'), 404
     else: 
-        # data_serialized = [character.serialize() for character in characters]   ALTERNATIVA
+        # data_serialized = [character.serialize() for character in characters]   ALTERNATIVA AL MAP
         data_serialized = list(map(lambda character: character.serialize(), characters)) 
         return jsonify(data_serialized), 200
 
