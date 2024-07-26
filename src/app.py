@@ -72,13 +72,17 @@ def get_one_user(id):
 @app.route('/user', methods=['POST'])
 def post_user():
     user = request.get_json()
-   
+    user_by_email = User.query.filter_by(email=user['email']).first()
+
     if not isinstance(user['name'], str) or len(user['name'].strip()) == 0:
          return({'error':'"name" must be a string'}), 400
     if not isinstance(user['last_name'], str) or len(user['last_name'].strip()) == 0:
          return({'error':'"last_name" must be a string'}), 400
     if not isinstance(user['email'], str) or len(user['email'].strip()) == 0:
          return({'error':'"email" must be a string'}), 400
+    if user_by_email:
+        if user_by_email.email == user['email']:
+            return jsonify('This email is already used'), 403
     if not isinstance(user['password'], str) or len(user['password'].strip()) == 0:
          return({'error':'"password" must be a string'}), 400
     # if not isinstance(user['subscription_date'], date) or len(user['subscription_date'].strip()) == 0:
@@ -87,7 +91,7 @@ def post_user():
     user_created = User(name=user['name'], last_name=user['last_name'], email=user['email'], password=user['password'], subscription_date=date.today())
     db.session.add(user_created)
     db.session.commit()
-    return jsonify(user_created), 200
+    return jsonify(user_created.serialize()), 200
 
 # DELETE ONE USER / ELIMINAR UN USUARIO
 @app.route('/user/<int:id>', methods=['DELETE'])

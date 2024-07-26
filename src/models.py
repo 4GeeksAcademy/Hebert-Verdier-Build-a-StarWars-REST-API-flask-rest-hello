@@ -5,11 +5,11 @@ db = SQLAlchemy()
 # USER
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=True, nullable=False)
-    last_name = db.Column(db.String(80), unique=False, nullable=False)
-    email = db.Column(db.String(80), unique=False, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    subscription_date = db.Column(db.Date, unique=False, nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    last_name = db.Column(db.String(80), nullable=False)
+    email = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(80), nullable=False)
+    subscription_date = db.Column(db.Date, nullable=False)
 
     favorites = db.relationship('Favorite', backref = 'user', lazy = True)
     # REFERENCIA A LA RELACION ENTRE LA TABLA USER Y FAVORITE
@@ -22,7 +22,7 @@ class User(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "last_name": self.name,
+            "last_name": self.last_name,
             "email": self.email,
             "subscription_date": self.subscription_date,
             # do not serialize the password, its a security breach
@@ -115,10 +115,11 @@ class Favorite(db.Model):
         # EVITAR MOSTRAR DATOS DE LOS CAMPOS VACIOS
 
     def serialize(self):
-        return {
-            "id": self.id,
-            "user_id": self.user_id,
-            "character_id": self.character_id,
-            "planet_id": self.planet_id,
-            "vehicle_id": self.vehicle_id,
-        }
+        if self.character_id:
+            return {"character": self.character_id, "id": self.id, "user": self.user_id}
+        elif self.planet_id:
+            return {"planet": self.planet_id, "id": self.id, "user": self.user_id}
+        elif self.vehicle_id:
+            return {"vehicle": self.vehicle_id, "id": self.id, "user": self.user_id}
+        else:
+            return {"id": self.id, "user": self.user_id}
