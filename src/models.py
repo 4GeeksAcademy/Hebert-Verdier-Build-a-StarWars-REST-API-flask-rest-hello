@@ -40,9 +40,13 @@ class User(db.Model):
 class Character(db.Model):
     # __tablename__ = 'character'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), nullable=False)
+    name = db.Column(db.String(250), unique=True, nullable=False)
     gender = db.Column(db.String(250), nullable=False)
+    height = db.Column(db.String(250), unique=True, nullable=False)
     eye_color = db.Column(db.String(250), nullable=False)
+    skin_color = db.Column(db.String(250), nullable=False)
+    image = db.Column(db.String(500), nullable=False)
+
 
     favorite = db.relationship('Favorite', backref = 'character', lazy = True)
 
@@ -55,6 +59,7 @@ class Character(db.Model):
             "name": self.name,
             "gender": self.gender,
             "eye_color": self.eye_color,
+            "image": self.image
         }
 
 # PLANETS

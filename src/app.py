@@ -137,8 +137,10 @@ def post_character():
          return({'error':'"gender" must be a string'}), 400
     if not isinstance(character['eye_color'], str) or len(character['eye_color'].strip()) == 0:
          return({'error':'"eye_color" must be a string'}), 400
+    if not isinstance(character['image'], str) or len(character['image'].strip()) == 0:
+         return({'error':'"image" must be a string'}), 400
 
-    character_created = Character(name=character['name'],gender=character['gender'],eye_color=character['eye_color'])
+    character_created = Character(name=character['name'],gender=character['gender'],eye_color=character['eye_color'],image=character['image'])
     print(character_created)
     db.session.add(character_created)
     db.session.commit()
