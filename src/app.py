@@ -130,17 +130,25 @@ def get_one_character(id):
 @app.route('/character', methods=['POST'])
 def post_character():
     character = request.get_json()
+    user_by_name = User.query.filter_by(name=character['name']).first()
    
     if not isinstance(character['name'], str) or len(character['name'].strip()) == 0:
          return({'error':'"name" must be a string'}), 400
+    if user_by_name:
+        if user_by_name.name == character['name']:
+            return jsonify('This email is already used'), 403
     if not isinstance(character['gender'], str) or len(character['gender'].strip()) == 0:
          return({'error':'"gender" must be a string'}), 400
+    if not isinstance(character['height'], str) or len(character['height'].strip()) == 0:
+         return({'error':'"height" must be a string'}), 400
     if not isinstance(character['eye_color'], str) or len(character['eye_color'].strip()) == 0:
          return({'error':'"eye_color" must be a string'}), 400
+    if not isinstance(character['skin_color'], str) or len(character['skin_color'].strip()) == 0:
+         return({'error':'"skin_color" must be a string'}), 400
     if not isinstance(character['image'], str) or len(character['image'].strip()) == 0:
          return({'error':'"image" must be a string'}), 400
 
-    character_created = Character(name=character['name'],gender=character['gender'],eye_color=character['eye_color'],image=character['image'])
+    character_created = Character(name=character['name'],gender=character['gender'],height=character['height'],eye_color=character['eye_color'],skin_color=character['skin_color'],image=character['image'])
     print(character_created)
     db.session.add(character_created)
     db.session.commit()

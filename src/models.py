@@ -42,7 +42,7 @@ class Character(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), unique=True, nullable=False)
     gender = db.Column(db.String(250), nullable=False)
-    height = db.Column(db.String(250), unique=True, nullable=False)
+    height = db.Column(db.String(250), nullable=False)
     eye_color = db.Column(db.String(250), nullable=False)
     skin_color = db.Column(db.String(250), nullable=False)
     image = db.Column(db.String(500), nullable=False)
@@ -58,7 +58,9 @@ class Character(db.Model):
             "id": self.id,
             "name": self.name,
             "gender": self.gender,
+            "height": self.height,
             "eye_color": self.eye_color,
+            "skin_color": self.skin_color,
             "image": self.image
         }
 
