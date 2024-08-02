@@ -41,6 +41,7 @@ class Character(db.Model):
     # __tablename__ = 'character'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), unique=True, nullable=False)
+    birth_year = db.Column(db.String(250), nullable=False)
     gender = db.Column(db.String(250), nullable=False)
     height = db.Column(db.String(250), nullable=False)
     eye_color = db.Column(db.String(250), nullable=False)
@@ -57,6 +58,7 @@ class Character(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "birth_year": self.birth_year,
             "gender": self.gender,
             "height": self.height,
             "eye_color": self.eye_color,
@@ -68,12 +70,15 @@ class Character(db.Model):
 class Planet(db.Model):
     # __tablename__ = 'planet'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), nullable=False)
+    name = db.Column(db.String(250), unique=True, nullable=False)
+    climate = db.Column(db.String(250), nullable=False)
     population = db.Column(db.String(250), nullable=False)
+    orbital_period = db.Column(db.String(250), nullable=False)
+    rotation_period = db.Column(db.String(250), nullable=False)
     diameter = db.Column(db.String(250), nullable=False)
+    image = db.Column(db.String(250), nullable=False)
 
     favorite = db.relationship('Favorite', backref = 'planet', lazy = True)
-    
 
     def __repr__(self):
         return '<Planet %r>' % self.name
@@ -82,10 +87,13 @@ class Planet(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "climate": self.climate,
             "population": self.population,
+            "orbital_period": self.orbital_period,
+            "rotation_period": self.rotation_period,
             "diameter": self.diameter,
-        }
-
+            "image": self.image,
+        } 
 # VEHICLES
 class Vehicle(db.Model):
     # __tablename__ = 'vehicle'
@@ -122,11 +130,16 @@ class Favorite(db.Model):
         # EVITAR MOSTRAR DATOS DE LOS CAMPOS VACIOS
 
     def serialize(self):
+        character = Character.query.filter_by(id=self.character_id).first()
+        planet = Planet.query.filter_by(id=self.planet_id).first()
+        vehicle = Vehicle.query.filter_by(id=self.vehicle_id).first()
+
+        print(character.serialize()["name"])
         if self.character_id:
-            return {"character": self.character_id, "id": self.id, "user": self.user_id}
+            return {"character": self.character_id, "name": character.serialize()["name"] , "id": self.id, "user": self.user_id}
         elif self.planet_id:
-            return {"planet": self.planet_id, "id": self.id, "user": self.user_id}
+            return {"planet": self.planet_id, "name": planet.serialize()["name"], "id": self.id, "user": self.user_id}
         elif self.vehicle_id:
-            return {"vehicle": self.vehicle_id, "id": self.id, "user": self.user_id}
+            return {"vehicle": self.vehicle_id, "name": vehicle.serialize()["name"], "id": self.id, "user": self.user_id}
         else:
             return {"id": self.id, "user": self.user_id}

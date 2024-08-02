@@ -130,13 +130,15 @@ def get_one_character(id):
 @app.route('/character', methods=['POST'])
 def post_character():
     character = request.get_json()
-    user_by_name = User.query.filter_by(name=character['name']).first()
+    character_by_name = Character.query.filter_by(name=character['name']).first()
    
     if not isinstance(character['name'], str) or len(character['name'].strip()) == 0:
          return({'error':'"name" must be a string'}), 400
-    if user_by_name:
-        if user_by_name.name == character['name']:
-            return jsonify('This email is already used'), 403
+    if character_by_name:
+        if character_by_name.name == character['name']:
+            return jsonify({'error':'This name is already used'}), 403
+    if not isinstance(character['birth_year'], str) or len(character['birth_year'].strip()) == 0:
+         return({'error':'"birth_year" must be a string'}), 400    
     if not isinstance(character['gender'], str) or len(character['gender'].strip()) == 0:
          return({'error':'"gender" must be a string'}), 400
     if not isinstance(character['height'], str) or len(character['height'].strip()) == 0:
@@ -148,7 +150,7 @@ def post_character():
     if not isinstance(character['image'], str) or len(character['image'].strip()) == 0:
          return({'error':'"image" must be a string'}), 400
 
-    character_created = Character(name=character['name'],gender=character['gender'],height=character['height'],eye_color=character['eye_color'],skin_color=character['skin_color'],image=character['image'])
+    character_created = Character(name=character['name'],birth_year=character['birth_year'],gender=character['gender'],height=character['height'],eye_color=character['eye_color'],skin_color=character['skin_color'],image=character['image'])
     print(character_created)
     db.session.add(character_created)
     db.session.commit()
@@ -190,15 +192,27 @@ def get_one_planet(id):
 @app.route('/planet', methods=['POST'])
 def post_planet():
     planet = request.get_json()
-   
+    planet_by_name = Planet.query.filter_by(name=planet['name']).first()
+
     if not isinstance(planet['name'], str) or len(planet['name'].strip()) == 0:
          return({'error':'"name" must be a string'}), 400
+    if planet_by_name:
+        if planet_by_name.name == planet['name']:
+            return jsonify({'error':'This name is already used'}), 403
+    if not isinstance(planet['climate'], str) or len(planet['climate'].strip()) == 0:
+         return({'error':'"climate" must be a string'}), 400
     if not isinstance(planet['population'], str) or len(planet['population'].strip()) == 0:
          return({'error':'"population" must be a string'}), 400
+    if not isinstance(planet['orbital_period'], str) or len(planet['orbital_period'].strip()) == 0:
+         return({'error':'"orbital_period" must be a string'}), 400
+    if not isinstance(planet['rotation_period'], str) or len(planet['rotation_period'].strip()) == 0:
+        return({'error':'"rotation_period" must be a string'}), 400
     if not isinstance(planet['diameter'], str) or len(planet['diameter'].strip()) == 0:
          return({'error':'"diameter" must be a string'}), 400
+    if not isinstance(planet['image'], str) or len(planet['image'].strip()) == 0:
+         return({'error':'"image" must be a string'}), 400
 
-    planet_created = Planet(name=planet['name'],population=planet['population'],diameter=planet['diameter'])
+    planet_created = Planet(name=planet['name'],climate=planet['climate'],population=planet['population'],orbital_period=planet['orbital_period'], rotation_period=planet['rotation_period'],diameter=planet['diameter'],image=planet['image'])
     db.session.add(planet_created)
     db.session.commit()
     return jsonify('Planet added'), 200
@@ -284,17 +298,19 @@ def get_user_favorites(user_id):
 def post_favorite_character(user_id, character_id):
     user = User.query.filter_by(id=user_id).first()
     character = Character.query.filter_by(id=character_id).first()
+    user_character = Favorite.query.filter_by(user_id=user_id, character_id=character_id).first()
 
     if user == None:
-        return jsonify('user not found'), 404
+        return ({'error':'user not found'}), 404
+    if character == None:
+        return ({'error':'character not found'}), 404
+    if user_character:
+        return ({'error':'This favorite already exists'}), 400
     else:
-        if character == None:
-            return jsonify('character not found'), 404
-        else:
-            user_favorite_character_created = Favorite(user_id=user_id, character_id=character_id)
-            db.session.add(user_favorite_character_created)
-            db.session.commit()
-            return jsonify('character added to user favorites'), 200
+        user_favorite_character_created = Favorite(user_id=user_id, character_id=character_id)
+        db.session.add(user_favorite_character_created)
+        db.session.commit()
+        return jsonify('character added to user favorites'), 200
 
 # POST FAVORITE PLANET / AÑADIR PERSONAJE PLANETA
 @app.route('/favorite/user/planet/<int:user_id>/<int:planet_id>', methods=['POST'])
